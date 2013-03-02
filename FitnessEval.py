@@ -1,6 +1,7 @@
 from copy import copy
 import izhikevich_neuron
-import data_loader
+from data_loader import read_training_files
+import math
 
 #Class for evaluation the fitness of a given phenotuype.
 
@@ -57,33 +58,49 @@ def blotto_fitness(population):
 #Spike Time
 #Spike Interval
 #Waveform
+trainingdata = read_training_files(2)
 def izzy_spike_time(population):
-    trainingdata = data_loader.read_training_files(2)
     power = 2
     S_b = izhikevich_neuron.find_spikes(trainingdata, 0)
-
+    
     for p in population:
         S_a = p.spikes
-        sigma = 0
-        dist = 0.0
+        sigma = 1.0
+        dist = 1.0
+        N = min(len(S_a),len(S_b))
+        if N == 0:
+            p.set_fitness(0)
+            continue
         for t_ai, t_bi in zip(S_a, S_b):
             sigma += abs(t_ai - t_bi)**power
-        nv = sigma**(1/power)
-        if min(len(S_a),len(S_b)) == 0:
-            nv += abs(len(S_a) - len(S_b))*1000
-            dist = nv
-        else:
-            nv += abs(len(S_a) - len(S_b))*1000/min(len(S_a),len(S_b))
-            dist = ( (1/min(len(S_a),len(S_b)))*nv )+1
+        nv = math.sqrt(sigma)
+        nv += abs(len(S_a) - len(S_b))*1000/N*2.0
+        dist = nv/N
         print S_a
         print S_b
         print "DISTANCE "+str(dist)
-        fitness = 1/dist/dist
+        p.set_distance( dist )
+        fitness = (1.0/dist)*1000
         print "Fitness "+str(fitness)
         p.set_fitness( fitness )
 
-def izzy_spike_interval(self):
-    pass
+def izzy_spike_interval(population):
+    power = 4
+    S_b = izhikevich_neuron.find_spikes(trainingdata, 0)
+    for p in population:
+        tsum = 0
+        S_a = p.spikes
+        
+        N = min(len(S_a), len(S_b))
+        for ai, ap, bi, bp in zip(S_a[1:],S_a,S_b[1:],S_b):
+            tsum += abs((ai-ap) - (bi-bp))**power
+        tsum = tsum ** (1/p)
+        if N > 1:
+            tsum += abs(len(S_a) - len(S_b))*1000/min(len(S_a),len(S_b))
+            tsum = tsum / (N-1)
+        else:
+            tsum += abs(len(S_a) - len(S_b))*1000
+        p.set_fitness( (1/ (1 / (tsum))) * 1000 )
 
 def izzy_waveform(self):
     pass

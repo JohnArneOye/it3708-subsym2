@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from data_loader import read_training_files
 
 class Plotting:
     ea = None
@@ -74,13 +75,40 @@ class Blotting:
 class NeuroPlot:
     
     def __init__(self, ea):
-        pass
+        self.ea = ea
+        self.generation = []
+        self.max_fitness = []
+        self.avg_fitness = []
+        self.std_deviation = []
     
     def update(self):
-        pass
+        self.generation.append(self.ea.generation)
+        self.max_fitness.append(self.ea.best_individual.fitness)
+        self.avg_fitness.append(self.ea.average_fitness)
+        self.std_deviation.append(self.ea.std_deviation)
     
     def plot(self):
-        pass
+
+        spiketrain1 = self.ea.best_individual.spiketrain
+        spiketrain2 = read_training_files(2)
+        
+        fig = plt.figure()
+        plt.plot(xrange(0,1001), spiketrain1, xrange(0,1001), spiketrain2)
+        plt.ylabel("Test spiketrain vs best evolved spiketrain")
+        plt.show()
+        fig.savefig("spiketrains/%s-%spop-%sgen.png"%("SIGMA",self.ea.population_size,self.ea.generation))
+        print "FINAL: fit:" +str(self.ea.best_individual.fitness)+" dist:"+str(self.ea.best_individual.distance) + str(self.ea.best_individual)
+        
+        fig = plt.figure()
+        plt.subplot(211)
+        plt.plot(self.generation, self.max_fitness, self.generation, self.avg_fitness)
+        plt.ylabel("Max and average fitness")
+        
+        plt.subplot(212)
+        plt.plot(self.generation, self.std_deviation)
+        plt.ylabel("Standard deviation")
+        fig.savefig("fitnessplots/%s-%spop-%sgen.png"%("SIGMA",self.ea.population_size,self.ea.generation))
+        
     
     #Take in a izzy neuron and plot the spike train and the spikes and stuff
     def plot_neuron(self):

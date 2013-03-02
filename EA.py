@@ -12,9 +12,9 @@ import random
 class EA:
     
     population_size = 200 #Size of the population
-    generations = 1000 #Number of generations
+    generations = 2 #Number of generations
     generation = 0 #Current generation number
-    fitness_goal = 100 #The fitness goal
+    fitness_goal = 400 #The fitness goal
     crossover_rate = 1.0 #The rate of which to perform crossover
     k = 4 #Group size in k_tournament
     e = 0.1 #Probability of selecting random in k_tournament
@@ -73,7 +73,6 @@ class EA:
             self.overproduction_factor = int( raw_input("Over production factor: ") )
         self.reproducers = self.parent_selection_fn(self.population, self.sum_population(), self.overproduction_factor, self.rank_min, self.rank_max, self.k, self.e)
         
-    
     def reproduce(self):
         self.children = []
         for p in self.reproducers:
@@ -87,9 +86,7 @@ class EA:
         for p in self.children:
             p.development()
         self.generation += 1
-        self.population = self.adult_selection_fn(self.population, self.children, self.population_size)
-          
-          
+        self.population = self.adult_selection_fn(self.population, self.children, self.population_size)     
     
     def sorted_population(self):
         return sorted(self.population, lambda x, y: cmp(x.fitness, y.fitness))[::-1]
@@ -164,6 +161,7 @@ class Selection:
                 expected_mating = 1
             else:
                 expected_mating = int(1 + ( (p.fitness-average_fitness) / 2*standard_deviation ))
+#            print "EXPECRTED MATING: "+str(expected_mating)+" FOR "+str(p)
             for _ in range(0, expected_mating):
                 mating_wheel.append(p) #Indexes
         #THEN SPIN ZE WHEEEEL
@@ -182,7 +180,6 @@ class Selection:
         for p in population:
             rank = (sorted_population.index(p)+1)
             expected_mating = int( rank_min+(rank_max-rank_min)*((rank-1)/(len(population))) )
-            print rank
             for _ in range(0, expected_mating):
                 mating_wheel.append(p)
             

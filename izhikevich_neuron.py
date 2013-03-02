@@ -19,6 +19,7 @@ class Izzy(Individual):
         self.fitness = 0.0
         self.v = -60.0
         self.u = 0.0
+        self.distance = 0
     
     #Creates an intitial random genotype for representing the 
     #five variables; a, b, c, d, and K
@@ -65,7 +66,8 @@ class Izzy(Individual):
         #We must find the spikes! I.e. find where the train tops or goes over threshold?
         self.spikes = find_spikes(self.spiketrain, 0)
         
-        
+    def set_distance(self, dist):
+        self.distance = dist
     
     #Perform crossover on the genotype
     def crossover(self, other, crossover_rate):
