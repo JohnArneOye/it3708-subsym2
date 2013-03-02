@@ -107,8 +107,10 @@ def dev_parameter(glist, start, stop, binlim, lim):
     
 #Takes in the spiketrain, returns the data points of the spikes, i thinks        
 def find_spikes(data, t):
-    spikes = [0]
-    spikes.extend( [ i+2 for i,j in zip(range(1,997,5),range(5,1002,5)) if data[i+2]==max(data[i:j]) and data[i+2]>t ] )
+    spikes = []
+    for i,j in zip(range(0,997),range(5,1002)):
+        if data[i+2]==max(data[i:j]) and data[i+2]>t:
+            spikes.append(i+2)  
     return spikes
     
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+import izhikevich_neuron
 #Load the training data. Returns a list of the data.
 
 def read_training_files(data_nr):
@@ -9,5 +10,8 @@ def read_training_files(data_nr):
     return training_data
 
 if __name__ == '__main__':
-    print read_training_files(1)
+    spiketrain = read_training_files(1)
+    print spiketrain
+    print izhikevich_neuron.find_spikes(spiketrain, 0)
+    
     

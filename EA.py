@@ -11,10 +11,10 @@ import random
 
 class EA:
     
-    population_size = 200 #Size of the population
-    generations = 2 #Number of generations
+    population_size = 400 #Size of the population
+    generations = 60 #Number of generations
     generation = 0 #Current generation number
-    fitness_goal = 400 #The fitness goal
+    fitness_goal = 200 #The fitness goal
     crossover_rate = 1.0 #The rate of which to perform crossover
     k = 4 #Group size in k_tournament
     e = 0.1 #Probability of selecting random in k_tournament
@@ -40,7 +40,7 @@ class EA:
         self.plotter = plotting_fn(self)
         self.individual_type = individual_type
         self.overproduction_factor = 1
-        self.rank_max = 2
+        self.rank_max = 0
         self.rank_min = 0
         
     def create(self):
@@ -67,8 +67,9 @@ class EA:
         self.plotter.update()
         
         if self.parent_selection_fn is Selection.rank:
-            self.rank_max = float( raw_input("Rank selection Max: ") )
-            self.rank_min = float( raw_input("Rank selection Min: ") )
+            if self.rank_max is 0:
+                self.rank_max = float( raw_input("Rank selection Max: ") )
+                self.rank_min = float( raw_input("Rank selection Min: ") )
         if self.adult_selection_fn is Selection.over_production and self.overproduction_factor is 1:
             self.overproduction_factor = int( raw_input("Over production factor: ") )
         self.reproducers = self.parent_selection_fn(self.population, self.sum_population(), self.overproduction_factor, self.rank_min, self.rank_max, self.k, self.e)
@@ -104,8 +105,6 @@ class EA:
 #and selection mechanisms  
 class Selection:
     
-    
-        
     #SELECTION PROTOCOLS
     @staticmethod
     def full_gen_replacement(population, children, pop_size):
@@ -177,11 +176,12 @@ class Selection:
         expected_mating = []
         sorted_population = sorted(population, lambda x, y: cmp(x.fitness, y.fitness))[::-1]
         mating_wheel = []
-        for p in population:
-            rank = (sorted_population.index(p)+1)
-            expected_mating = int( rank_min+(rank_max-rank_min)*((rank-1)/(len(population))) )
+        for i in xrange(len(sorted_population)):
+            rank = i+1
+            expected_mating = int( rank_min+(rank_max-rank_min)*((rank-1)/(len(population)-1)) )
+            print expected_mating
             for _ in range(0, expected_mating):
-                mating_wheel.append(p)
+                mating_wheel.append(sorted_population[i])
             
         #THEN SPIN ZE WHEEEEL, make own method? and proper! this is crap
         reproducers = []
@@ -242,7 +242,7 @@ if __name__ == '__main__':
 #    adult_selection_nr = int( raw_input("Adult selection: ") )
 #    fitness_fn = int( raw_input("Fitness function: "))
     
-    ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[2], PARENT_SELECTION_FUNCTIONS[2], PLOT_TYPE[3])
+    ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[2], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
     ea.create()
     ea.develop()
     for _ in range(0, ea.generations):

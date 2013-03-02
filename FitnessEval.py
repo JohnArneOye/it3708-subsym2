@@ -80,7 +80,7 @@ def izzy_spike_time(population):
         print S_b
         print "DISTANCE "+str(dist)
         p.set_distance( dist )
-        fitness = (1.0/dist)*1000
+        fitness = (1.0/dist)*200
         print "Fitness "+str(fitness)
         p.set_fitness( fitness )
 

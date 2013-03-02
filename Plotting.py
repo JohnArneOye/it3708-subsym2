@@ -96,8 +96,9 @@ class NeuroPlot:
         plt.plot(xrange(0,1001), spiketrain1, xrange(0,1001), spiketrain2)
         plt.ylabel("Test spiketrain vs best evolved spiketrain")
         plt.show()
-        fig.savefig("spiketrains/%s-%spop-%sgen.png"%("SIGMA",self.ea.population_size,self.ea.generation))
-        print "FINAL: fit:" +str(self.ea.best_individual.fitness)+" dist:"+str(self.ea.best_individual.distance) + str(self.ea.best_individual)
+        run_string = "%s-%spop-%sgen"%("SIGMA",self.ea.population_size,self.ea.generation)
+        fig.savefig("spiketrains/"+run_string+".png")
+        print run_string +" fit:" +str(self.ea.best_individual.fitness)+" dist:"+str(self.ea.best_individual.distance) + str(self.ea.best_individual)
         
         fig = plt.figure()
         plt.subplot(211)
