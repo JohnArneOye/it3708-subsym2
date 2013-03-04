@@ -28,8 +28,8 @@ class Izzy(Individual):
         
     #Perform mutation on the genotype
     def mutate(self, mutation_prob, mutation_count):
-        if random.random() < mutation_prob:
-            for _ in range(mutation_count):
+        for _ in range(mutation_count):
+            if random.random() < mutation_prob:
                 self.genotype = self.genotype ^ (1 << random.randint(0, self.nr_of_bits))
         
     #Develop the genotype to a set of parameters, which are the phenotype for the neuron
@@ -42,15 +42,15 @@ class Izzy(Individual):
             gtype = gtype/2
         
         #Develop 'a' parameter: | RANGE: [0.001, 0.2]  *1000 -> [1, 200]
-        self.a = (dev_parameter(genome_list, 0, 16, 65536, 200)+1) /1000
+        self.a = (dev_parameter(genome_list, 0, 16, 65536, 200)+1) / 1000.0
         #Develop 'b' parameter: | RANGE: [0.01, 0.3]  *100  -> [1, 30]
-        self.b = (dev_parameter(genome_list, 16, 26, 1024, 30)+1) /100
+        self.b = (dev_parameter(genome_list, 16, 26, 1024, 30)+1) / 100.0
         #Develop 'c' parameter: | RANGE: [-80, -30]  -30  -> [-50, 0]
-        self.c = -dev_parameter(genome_list, 26, 38, 4096, 50) -30
+        self.c = -dev_parameter(genome_list, 26, 38, 4096, 50) - 30.0
         #Develop 'd' parameter: | RANGE: [0.1, 10]  *10  -> [1, 100]
-        self.d = (dev_parameter(genome_list, 38, 52, 16384, 100)+1) /10
+        self.d = (dev_parameter(genome_list, 38, 52, 16384, 100)+1) / 10.0
         #Develop 'k' parameter: | RANGE: [0.01, 1]  *100  -> [1. 100]
-        self.k = (dev_parameter(genome_list, 52, 66, 16384, 100)+1) /100
+        self.k = (dev_parameter(genome_list, 52, 66, 16384, 100)+1) / 100.0
         
         #GET ON DA SPIKE TRAIN! CHOO CHOO!
         self.spiketrain = []
@@ -108,7 +108,9 @@ def dev_parameter(glist, start, stop, binlim, lim):
 #Takes in the spiketrain, returns the data points of the spikes, i thinks        
 def find_spikes(data, t):
     spikes = []
-    for i,j in zip(range(0,997),range(5,1002)):
+    k = 5
+    l = len(data)
+    for i,j in zip(range(0,l-k),range(k,l)):
         if data[i+2]==max(data[i:j]) and data[i+2]>t:
             spikes.append(i+2)  
     return spikes

@@ -65,19 +65,19 @@ def izzy_spike_time(population):
     
     for p in population:
         S_a = p.spikes
-        sigma = 1.0
-        dist = 1.0
+        
         N = min(len(S_a),len(S_b))
         if N == 0:
             p.set_fitness(0)
             continue
+        
+        sigma = 0
         for t_ai, t_bi in zip(S_a, S_b):
             sigma += abs(t_ai - t_bi)**power
-        nv = math.sqrt(sigma)
-        nv += abs(len(S_a) - len(S_b))*1000/N*2.0
+        
+        nv = sigma ** (power ** -1)
         dist = nv/N
-        print S_a
-        print S_b
+        
         print "DISTANCE "+str(dist)
         p.set_distance( dist )
         fitness = (1.0/dist)*1000
@@ -88,28 +88,35 @@ def izzy_spike_interval(population):
     power = 4
     S_b = izhikevich_neuron.find_spikes(trainingdata, 0)
     for p in population:
-        tsum = 0
         S_a = p.spikes
         
         N = min(len(S_a), len(S_b))
-        for ta, ta2, tb, tb2 in zip(S_a[1:],S_a,S_b[1:],S_b):
-            tsum += abs((ta-ta2) - (tb-tb2))**power
-        tsum = tsum ** (1/power)
-        if N > 1:
-            tsum += abs(len(S_a) - len(S_b))*1000/N
-            tsum = tsum / (N-1)
-        else:
-            tsum += abs(len(S_a) - len(S_b))*1000
-        p.set_fitness(  (1 / (tsum)) * 1000 )
+        
+        if N <= 1:
+            p.set_fitness(0)
+            continue
+        
+        sigma = 0
+        for i in range(1, N):
+            sigma += abs((S_a[i] - S_a[i-1]) - (S_b[i] - S_b[i-1]))**power
+        
+        distance = sigma ** (power ** -1) / (N - 1)
+        print "DISTANCE", distance
+        fitness = (1 / distance) * 1000
+        print "Fitness", fitness
+        p.set_fitness(fitness)
 
 def izzy_waveform(population):
     power = 2
     for p in population:
-        tsum = 0
         st = p.spiketrain
         td = trainingdata
+        
+        tsum = 0
         for va,vb in zip(st, td):
             tsum += (va-vb)**power
-        tsum = tsum**(1/p)
+        tsum = tsum**(power**-1)
         tsum /= 1001
+        print "Distance", tsum
+        print "Fitness", 1/tsum
         p.set_fitness( 1/tsum )
