@@ -15,14 +15,14 @@ class EA:
     generations = 150 #Number of generations
     generation = 0 #Current generation number
     fitness_goal = 1000 #The fitness goal
-    crossover_rate = 0.6 #The rate of which to perform crossover
+    crossover_rate = 0.95 #The rate of which to perform crossover
     k = 5 #Group size in k_tournament
     e = 0.1 #Probability of selecting random in k_tournament
-    mutation_probability = 0.4 #Probability that mutation of a specimen will occur
+    mutation_probability = 0.1 #Probability that mutation of a specimen will occur
     mutation_count = 1 #Number of bits mutated when mutating
     rank_max = 2.0 #Max in rank selection
     rank_min = 0.0 #Min in rank selection
-    overproduction_factor = 0 #The factor of children to be produced with OP
+    overproduction_factor = 2 #The factor of children to be produced with OP
     
     stagnate_counter = 0
 
@@ -271,7 +271,7 @@ if __name__ == '__main__':
 #    adult_selection_nr = int( raw_input("Adult selection: ") )
 #    fitness_fn = int( raw_input("Fitness function: "))
     for _ in range(10):
-        ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[3], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
+        ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[3], PARENT_SELECTION_FUNCTIONS[2], PLOT_TYPE[3])
         ea.create()
         ea.develop()
         for _ in range(0, ea.generations):
@@ -280,5 +280,11 @@ if __name__ == '__main__':
             ea.operate()
             ea.replace()
         ea.plotter.plot()
-     
+#    population = [Izzy() for _ in range(1000)]
+#    print [p.genotype for p in population]
+#    for p in population:
+#        p.development()
+#    for p in population:
+#        print p
+#     
        
