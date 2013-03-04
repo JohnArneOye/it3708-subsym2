@@ -88,15 +88,15 @@ class NeuroPlot:
         self.std_deviation.append(self.ea.std_deviation)
     
     def plot(self):
-
+        training_nr = 1
         spiketrain1 = self.ea.best_individual.spiketrain
-        spiketrain2 = read_training_files(2)
+        spiketrain2 = read_training_files(training_nr)
         
         fig = plt.figure()
         plt.plot(xrange(0,1001), spiketrain1, xrange(0,1001), spiketrain2)
         plt.ylabel("Test spiketrain vs best evolved spiketrain")
         plt.show()
-        run_string = "%s-%spop-%sgen-%sfit-%sdist-%scross-%smut-%sop-%srmax.png"%("KTOUR",
+        run_string = "%s-%spop-%sgen-%sfit-%sdist-%scross-%smut-%sop-%srmax-%sdata.png"%("KTOUR",
                                                                       self.ea.population_size,
                                                                       self.ea.generation,
                                                                       self.ea.best_individual.fitness, 
@@ -104,7 +104,8 @@ class NeuroPlot:
                                                                       self.ea.crossover_rate,
                                                                       self.ea.mutation_probability,
                                                                       self.ea.overproduction_factor,
-                                                                      self.ea.rank_max)
+                                                                      self.ea.rank_max,
+                                                                      training_nr)
         fig.savefig("spiketrains/"+run_string+".png")
         print run_string +" fit:" +str(self.ea.best_individual.fitness)+" dist:"+str(self.ea.best_individual.distance) + str(self.ea.best_individual)
         

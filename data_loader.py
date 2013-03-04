@@ -9,9 +9,9 @@ def read_training_files(data_nr):
     data_file.close()
     return training_data
 
-if __name__ == '__main__':
-    spiketrain = read_training_files(1)
-    print spiketrain
-    print izhikevich_neuron.find_spikes(spiketrain, 0)
+#if __name__ == '__main__':
+#    spiketrain = read_training_files(1)
+#    print spiketrain
+#    print izhikevich_neuron.find_spikes(spiketrain, 0)
     
     
