@@ -96,7 +96,15 @@ class NeuroPlot:
         plt.plot(xrange(0,1001), spiketrain1, xrange(0,1001), spiketrain2)
         plt.ylabel("Test spiketrain vs best evolved spiketrain")
         plt.show()
-        run_string = "%s-%spop-%sgen"%("SIGMA",self.ea.population_size,self.ea.generation)
+        run_string = "%s-%spop-%sgen-%sfit-%sdist-%scross-%smut-%sop-%srmax.png"%("KTOUR",
+                                                                      self.ea.population_size,
+                                                                      self.ea.generation,
+                                                                      self.ea.best_individual.fitness, 
+                                                                      self.ea.best_individual.distance, 
+                                                                      self.ea.crossover_rate,
+                                                                      self.ea.mutation_probability,
+                                                                      self.ea.overproduction_factor,
+                                                                      self.ea.rank_max)
         fig.savefig("spiketrains/"+run_string+".png")
         print run_string +" fit:" +str(self.ea.best_individual.fitness)+" dist:"+str(self.ea.best_individual.distance) + str(self.ea.best_individual)
         
@@ -108,7 +116,7 @@ class NeuroPlot:
         plt.subplot(212)
         plt.plot(self.generation, self.std_deviation)
         plt.ylabel("Standard deviation")
-        fig.savefig("fitnessplots/%s-%spop-%sgen.png"%("SIGMA",self.ea.population_size,self.ea.generation))
+        fig.savefig("fitnessplots/"+run_string+".png")
         
     
     #Take in a izzy neuron and plot the spike train and the spikes and stuff

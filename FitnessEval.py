@@ -80,7 +80,7 @@ def izzy_spike_time(population):
         print S_b
         print "DISTANCE "+str(dist)
         p.set_distance( dist )
-        fitness = (1.0/dist)*200
+        fitness = (1.0/dist)*1000
         print "Fitness "+str(fitness)
         p.set_fitness( fitness )
 
@@ -92,15 +92,15 @@ def izzy_spike_interval(population):
         S_a = p.spikes
         
         N = min(len(S_a), len(S_b))
-        for ai, ap, bi, bp in zip(S_a[1:],S_a,S_b[1:],S_b):
-            tsum += abs((ai-ap) - (bi-bp))**power
-        tsum = tsum ** (1/p)
+        for ta, ta2, tb, tb2 in zip(S_a[1:],S_a,S_b[1:],S_b):
+            tsum += abs((ta-ta2) - (tb-tb2))**power
+        tsum = tsum ** (1/power)
         if N > 1:
-            tsum += abs(len(S_a) - len(S_b))*1000/min(len(S_a),len(S_b))
+            tsum += abs(len(S_a) - len(S_b))*1000/N
             tsum = tsum / (N-1)
         else:
             tsum += abs(len(S_a) - len(S_b))*1000
-        p.set_fitness( (1/ (1 / (tsum))) * 1000 )
+        p.set_fitness(  (1 / (tsum)) * 1000 )
 
 def izzy_waveform(self):
     pass

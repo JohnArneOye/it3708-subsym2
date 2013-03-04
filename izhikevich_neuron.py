@@ -4,7 +4,7 @@ import data_loader
 
 class Izzy(Individual):
     
-    nr_of_bits = 33
+    nr_of_bits = 66
     t = 10.0
     I = 10.0
 
@@ -24,7 +24,7 @@ class Izzy(Individual):
     #Creates an intitial random genotype for representing the 
     #five variables; a, b, c, d, and K
     def initial_genotype(self):
-        self.genotype = random.getrandbits(33)
+        self.genotype = random.getrandbits(66)
         
     #Perform mutation on the genotype
     def mutate(self, mutation_prob, mutation_count):
@@ -42,15 +42,15 @@ class Izzy(Individual):
             gtype = gtype/2
         
         #Develop 'a' parameter: | RANGE: [0.001, 0.2]  *1000 -> [1, 200]
-        self.a = (dev_parameter(genome_list, 0, 8, 256, 200)+1) /1000
+        self.a = (dev_parameter(genome_list, 0, 16, 65536, 200)+1) /1000
         #Develop 'b' parameter: | RANGE: [0.01, 0.3]  *100  -> [1, 30]
-        self.b = (dev_parameter(genome_list, 8, 13, 32, 30)+1) /100
+        self.b = (dev_parameter(genome_list, 16, 26, 1024, 30)+1) /100
         #Develop 'c' parameter: | RANGE: [-80, -30]  -30  -> [-50, 0]
-        self.c = -dev_parameter(genome_list, 13, 19, 64, 50) -30
+        self.c = -dev_parameter(genome_list, 26, 38, 4096, 50) -30
         #Develop 'd' parameter: | RANGE: [0.1, 10]  *10  -> [1, 100]
-        self.d = (dev_parameter(genome_list, 19, 26, 128, 100)+1) /10
+        self.d = (dev_parameter(genome_list, 38, 52, 16384, 100)+1) /10
         #Develop 'k' parameter: | RANGE: [0.01, 1]  *100  -> [1. 100]
-        self.k = (dev_parameter(genome_list, 26, 33, 128, 100)+1) /100
+        self.k = (dev_parameter(genome_list, 52, 66, 16384, 100)+1) /100
         
         #GET ON DA SPIKE TRAIN! CHOO CHOO!
         self.spiketrain = []

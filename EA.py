@@ -11,15 +11,17 @@ import random
 
 class EA:
     
-    population_size = 400 #Size of the population
-    generations = 60 #Number of generations
+    population_size = 250 #Size of the population
+    generations = 200 #Number of generations
     generation = 0 #Current generation number
-    fitness_goal = 200 #The fitness goal
-    crossover_rate = 1.0 #The rate of which to perform crossover
-    k = 4 #Group size in k_tournament
-    e = 0.1 #Probability of selecting random in k_tournament
-    mutation_probability = 0.5 #Probability that mutation of a specimen will occur
+    fitness_goal = 1000 #The fitness goal
+    crossover_rate = 0.5 #The rate of which to perform crossover
+    k = 5 #Group size in k_tournament
+    e = 0.2 #Probability of selecting random in k_tournament
+    mutation_probability = 0.3 #Probability that mutation of a specimen will occur
     mutation_count = 1 #Number of bits mutated when mutating
+    
+    stagnate_counter = 0
 
     population_genotype = []
     population_fitness = []
@@ -42,6 +44,7 @@ class EA:
         self.overproduction_factor = 1
         self.rank_max = 0
         self.rank_min = 0
+        self.best_individual = None
         
     def create(self):
         for _ in range(0, self.population_size):
@@ -57,9 +60,24 @@ class EA:
             
         population_fitness = [p.fitness for p in self.population]
         self.average_fitness = self.sum_population()/len(self.population)
+        self.previously_best_individual = self.best_individual
         self.best_individual = self.sorted_population()[0]
         self.std_deviation = sum( map(lambda x: (x - self.average_fitness)**2, population_fitness) )   
-  
+        
+        #count stagnate_counter if previously best is same fitness as this best
+        if self.previously_best_individual is not None:
+            print self.previously_best_individual.fitness
+            print self.best_individual.fitness
+            if self.previously_best_individual.fitness == self.best_individual.fitness:
+                self.stagnate_counter += 1
+                print "STAGNATING! "+str(self.stagnate_counter)
+            else:
+                self.stagnate_counter = 0
+        #turn up mutation rate if stagnate_counter > 10
+        if self.stagnate_counter>10:
+            self.mutation_probability += 0.1
+            print "TURNING UP MUTATION RATE"
+            
         if((self.generation%2) == 0):
             print "GENERATION:: " +str(self.generation)
             print [p for p in self.population]
@@ -174,20 +192,27 @@ class Selection:
     @staticmethod
     def rank(population, sum_fitness, op, rank_min, rank_max, k=0, e=0):
         expected_mating = []
-        sorted_population = sorted(population, lambda x, y: cmp(x.fitness, y.fitness))[::-1]
+        sorted_population = sorted(population, lambda x, y: cmp(x.fitness, y.fitness))
         mating_wheel = []
-        for i in xrange(len(sorted_population)):
+        N = len(sorted_population)
+        for i in range(N):
             rank = i+1
-            expected_mating = int( rank_min+(rank_max-rank_min)*((rank-1)/(len(population)-1)) )
-            print expected_mating
-            for _ in range(0, expected_mating):
-                mating_wheel.append(sorted_population[i])
-            
-        #THEN SPIN ZE WHEEEEL, make own method? and proper! this is crap
-        reproducers = []
-        for _ in range(0, int(len(population)*op) ):
-            reproducers.append( mating_wheel[random.randint(0,len(mating_wheel)-1)] )
+            expected_mating = rank_min+(rank_max-rank_min)*((rank*1.0-1)/(N*1.0-1))
+            mating_wheel.append(expected_mating)
         
+        mate_sum = sum(mating_wheel)
+        mating_wheel[0]=mating_wheel[0]/mate_sum
+        for i in range(1,len(mating_wheel)):
+            mating_wheel[i]=mating_wheel[i-1]+(mating_wheel[i]/mate_sum)
+        
+        reproducers = []
+        #THEN SPIN ZE WHEEEEL, make own method? and proper! this is crap
+        for _ in range(0, int(len(population)*op) ):
+            r = random.random()
+            for i in range(0,len(mating_wheel)):
+                if mating_wheel[i]>r:
+                    reproducers.append(sorted_population[i])
+                    break
         return reproducers 
     
 
@@ -242,7 +267,7 @@ if __name__ == '__main__':
 #    adult_selection_nr = int( raw_input("Adult selection: ") )
 #    fitness_fn = int( raw_input("Fitness function: "))
     
-    ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[2], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
+    ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[2], PARENT_SELECTION_FUNCTIONS[4], PLOT_TYPE[3])
     ea.create()
     ea.develop()
     for _ in range(0, ea.generations):
