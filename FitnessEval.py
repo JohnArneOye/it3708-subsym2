@@ -58,7 +58,7 @@ def blotto_fitness(population):
 #Spike Time
 #Spike Interval
 #Waveform
-trainingdata = read_training_files(1)
+trainingdata = read_training_files()
 def izzy_spike_time(population):
     power = 2
     S_b = izhikevich_neuron.find_spikes(trainingdata, 0)
@@ -102,5 +102,14 @@ def izzy_spike_interval(population):
             tsum += abs(len(S_a) - len(S_b))*1000
         p.set_fitness(  (1 / (tsum)) * 1000 )
 
-def izzy_waveform(self):
-    pass
+def izzy_waveform(population):
+    power = 2
+    for p in population:
+        tsum = 0
+        st = p.spiketrain
+        td = trainingdata
+        for va,vb in zip(st, td):
+            tsum += (va-vb)**power
+        tsum = tsum**(1/p)
+        tsum /= 1001
+        p.set_fitness( 1/tsum )

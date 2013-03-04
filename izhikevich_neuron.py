@@ -96,7 +96,7 @@ class Izzy(Individual):
         return bin(n)[2:].zfill(l)
     
     def __str__(self):
-        return "IzzyPhenotype<a: %s, b: %s, c: %s, d: %s, k: %s>"%(self.a,self.b,self.c,self.d,self.k)
+        return "IzzyPhenotype-a%sb%sc%sd%sk%s"%(self.a,self.b,self.c,self.d,self.k)
     
     def __repr__(self):
         return self.__str__()

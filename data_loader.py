@@ -1,7 +1,7 @@
 import izhikevich_neuron
 #Load the training data. Returns a list of the data.
 
-def read_training_files(data_nr):
+def read_training_files(data_nr=1):
     data_file = open('training_data/izzy-train'+str(data_nr)+'.dat', 'r')
     training_data = [float(x) for x in data_file.read().strip().split() if x]
     assert len(training_data) == 1001

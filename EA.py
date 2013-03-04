@@ -12,17 +12,17 @@ import random
 class EA:
     
     population_size = 500 #Size of the population
-    generations = 200 #Number of generations
+    generations = 150 #Number of generations
     generation = 0 #Current generation number
     fitness_goal = 1000 #The fitness goal
-    crossover_rate = 0.5 #The rate of which to perform crossover
+    crossover_rate = 0.6 #The rate of which to perform crossover
     k = 5 #Group size in k_tournament
     e = 0.1 #Probability of selecting random in k_tournament
-    mutation_probability = 0.3 #Probability that mutation of a specimen will occur
+    mutation_probability = 0.4 #Probability that mutation of a specimen will occur
     mutation_count = 1 #Number of bits mutated when mutating
-    rank_max = 1.5 #Max in rank selection
-    rank_min = 0.5 #Min in rank selection
-    overproduction_factor = 2 #The factor of children to be produced with OP
+    rank_max = 2.0 #Max in rank selection
+    rank_min = 0.0 #Min in rank selection
+    overproduction_factor = 0 #The factor of children to be produced with OP
     
     stagnate_counter = 0
 
@@ -45,6 +45,7 @@ class EA:
         self.plotter = plotting_fn(self)
         self.individual_type = individual_type
         self.best_individual = None
+        self.best_overall_individual = None
         
     def create(self):
         for _ in range(0, self.population_size):
@@ -62,12 +63,17 @@ class EA:
         self.average_fitness = self.sum_population()/len(self.population)
         self.previously_best_individual = self.best_individual
         self.best_individual = self.sorted_population()[0]
-        self.std_deviation = sum( map(lambda x: (x - self.average_fitness)**2, population_fitness) )   
+        self.std_deviation = sum( map(lambda x: (x - self.average_fitness)**2, population_fitness) )
+        
+        #keep the best overall individual
+        if self.best_overall_individual is not None:
+            if self.best_overall_individual.fitness < self.best_individual.fitness:
+                self.best_overall_individual = self.best_individual
+        else:
+            self.best_overall_individual = self.best_individual
         
         #count stagnate_counter if previously best is same fitness as this best
         if self.previously_best_individual is not None:
-            print self.previously_best_individual.fitness
-            print self.best_individual.fitness
             if self.previously_best_individual.fitness == self.best_individual.fitness:
                 self.stagnate_counter += 1
                 print "STAGNATING! "+str(self.stagnate_counter)
@@ -81,7 +87,6 @@ class EA:
             
         if((self.generation%2) == 0):
             print "GENERATION:: " +str(self.generation)
-            print [p for p in self.population]
             print "Max fitness: " +str(self.best_individual.fitness) +": " + str(self.best_individual)
         self.plotter.update()
         
@@ -218,22 +223,20 @@ class Selection:
     
 
     #Selects the index of the reproducers in the population by means of local k-tournament, currently only works on popsizes divisible by k
-    #TODO: Doesn't work i thinks
     @staticmethod
     def k_tournament(population, sum_fitness, op, rank_min, rank_max, k, e):
         reproducers = []
         group_k = k
-        for i in range(0, len(population)):
-            if i == group_k-1:
-                #FACE-OFF!
-                tournament_group = population[(i-(k-1)):group_k]
-                for _ in range(int(len(tournament_group)*op)):
-                    if random.random()<e:
-                        reproducers.append( tournament_group[random.randint(0, k-1)] )
-                    else:
-                        tournament_group = sorted(tournament_group, lambda x, y: cmp(x.fitness, y.fitness))[::-1]
-                        reproducers.append( tournament_group[0] )
-                group_k = group_k + k
+        for i in range(k, len(population), k):
+            #FACE-OFF!
+            tournament_group = population[(i-(k)):group_k]
+            for _ in range(int(len(tournament_group)*op)):
+                if random.random()<e:
+                    reproducers.append( tournament_group[random.randint(0, k-1)] )
+                else:
+                    tournament_group = sorted(tournament_group, lambda x, y: cmp(x.fitness, y.fitness))[::-1]
+                    reproducers.append( tournament_group[0] )
+            group_k = group_k + k
         return reproducers
     
    
@@ -267,15 +270,15 @@ if __name__ == '__main__':
 #    parent_selection_nr = int( raw_input("Parent Selection: ") )
 #    adult_selection_nr = int( raw_input("Adult selection: ") )
 #    fitness_fn = int( raw_input("Fitness function: "))
-    
-    ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[2], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
-    ea.create()
-    ea.develop()
-    for _ in range(0, ea.generations):
-        ea.select()
-        ea.reproduce()
-        ea.operate()
-        ea.replace()
-    ea.plotter.plot()
- 
-   
+    for _ in range(10):
+        ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[3], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
+        ea.create()
+        ea.develop()
+        for _ in range(0, ea.generations):
+            ea.select()
+            ea.reproduce()
+            ea.operate()
+            ea.replace()
+        ea.plotter.plot()
+     
+       

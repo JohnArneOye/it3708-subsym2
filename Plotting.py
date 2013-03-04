@@ -89,27 +89,40 @@ class NeuroPlot:
     
     def plot(self):
         training_nr = 1
-        spiketrain1 = self.ea.best_individual.spiketrain
-        spiketrain2 = read_training_files(training_nr)
+        spiketrain1 = self.ea.best_overall_individual.spiketrain
+        spiketrain2 = read_training_files()
         
-        fig = plt.figure()
-        plt.plot(xrange(0,1001), spiketrain1, xrange(0,1001), spiketrain2)
-        plt.ylabel("Test spiketrain vs best evolved spiketrain")
-        plt.show()
-        run_string = "%s-%spop-%sgen-%sfit-%sdist-%scross-%smut-%sop-%srmax-%sdata.png"%("KTOUR",
+        title_string = "Pop size: %s. Generations: %s Fitness: %s Distance: %s \nC-rate: %s M-rate: %s Overproduction: %s R-Max: %s Dataset: %s \n%s"%(
                                                                       self.ea.population_size,
                                                                       self.ea.generation,
-                                                                      self.ea.best_individual.fitness, 
-                                                                      self.ea.best_individual.distance, 
+                                                                      self.ea.best_overall_individual.fitness, 
+                                                                      self.ea.best_overall_individual.distance, 
                                                                       self.ea.crossover_rate,
                                                                       self.ea.mutation_probability,
                                                                       self.ea.overproduction_factor,
                                                                       self.ea.rank_max,
-                                                                      training_nr)
+                                                                      training_nr, 
+                                                                      self.ea.best_overall_individual)
+        fig = plt.figure()
+        plt.title(title_string, fontsize=10)
+        plt.plot(xrange(0,1001), spiketrain1, xrange(0,1001), spiketrain2)
+        plt.ylabel("Test spiketrain vs best evolved spiketrain")
+        run_string = "%s-%spop-%sgen-%sfit-%sdist-%scross-%smut-%sop-%srmax-%sdata-%s.png"%("EA",
+                                                                      self.ea.population_size,
+                                                                      self.ea.generation,
+                                                                      self.ea.best_overall_individual.fitness, 
+                                                                      self.ea.best_overall_individual.distance, 
+                                                                      self.ea.crossover_rate,
+                                                                      self.ea.mutation_probability,
+                                                                      self.ea.overproduction_factor,
+                                                                      self.ea.rank_max,
+                                                                      training_nr, 
+                                                                      self.ea.best_overall_individual)
         fig.savefig("spiketrains/"+run_string+".png")
-        print run_string +" fit:" +str(self.ea.best_individual.fitness)+" dist:"+str(self.ea.best_individual.distance) + str(self.ea.best_individual)
+        print run_string +" fit:" +str(self.ea.best_overall_individual.fitness)+" dist:"+str(self.ea.best_overall_individual.distance) + str(self.ea.best_overall_individual)
         
         fig = plt.figure()
+        plt.title(title_string)
         plt.subplot(211)
         plt.plot(self.generation, self.max_fitness, self.generation, self.avg_fitness)
         plt.ylabel("Max and average fitness")
