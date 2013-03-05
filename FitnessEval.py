@@ -77,6 +77,9 @@ def izzy_spike_time(p, training_spikes):
         
     # print "DISTANCE "+str(dist)
     p.set_distance( dist )
+    if dist == 0:
+        return 1000
+    
     fitness = (1.0/dist)*200
     # print "Spike time", "Fitness", fitness
     return fitness * 10
@@ -97,6 +100,9 @@ def izzy_spike_interval(p, training_spikes):
         
     distance = sigma ** (power ** -1) / (N - 1)
     # print "DISTANCE", distance
+    if distance == 0:
+        return 1000
+    
     fitness = (1 / distance) * 300
     # print "Spike interval", "Fitness", fitness
     return fitness / 2.0
@@ -125,7 +131,7 @@ def spike_count_difference_penalty(p, training_spikes):
     
     L = len(trainingdata)
     penalty = 1.0 * (N - M) * L / (2 * M)
-    fitness = -penalty
+    fitness = -penalty / 10.0
     # diff = abs(len(training_spikes) - len(p.spikes))
     # fitness = (2*len(trainingdata)) / diff
     # fitness = - 10.0 / fitness
@@ -136,6 +142,7 @@ def spike_count_difference_penalty(p, training_spikes):
 
 def aggregated_fitness(population):
     training_spikes = izhikevich_neuron.find_spikes(trainingdata, 0)
+    print "Training spikes", training_spikes
     
     for p in population:
         fitnesses = []
