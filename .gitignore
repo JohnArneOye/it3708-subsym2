@@ -215,5 +215,7 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# Plots
 spiketrains/*.png
 fitnessplots/*.png

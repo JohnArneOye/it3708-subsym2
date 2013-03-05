@@ -1,4 +1,3 @@
-
 import sys
 import FitnessEval
 from Blotto import Blotto
@@ -10,7 +9,6 @@ from Plotting import Blotting
 import random
 
 class EA:
-    
     population_size = 500 #Size of the population
     generations = 150 #Number of generations
     generation = 0 #Current generation number
@@ -38,10 +36,10 @@ class EA:
     parent_selection_fn = None
     fitness = None
     
-    def __init__(self, individual_type, fitness_fns, adult_selection_fn, parent_selection_fn, plotting_fn):
+    def __init__(self, individual_type, fitness_fn, adult_selection_fn, parent_selection_fn, plotting_fn):
         self.adult_selection_fn = adult_selection_fn
         self.parent_selection_fn = parent_selection_fn
-        self.fitness_functions = fitness_fns
+        self.fitness_fn = fitness_fn
         self.plotter = plotting_fn(self)
         self.individual_type = individual_type
         self.best_individual = None
@@ -56,13 +54,7 @@ class EA:
             p.development()
     
     def select(self):
-        self.population_fitness = []
-        
-        for p in self.population:
-            p.fitness = 0
-        
-        for fitness_fn in self.fitness_functions:
-            fitness_fn(self.population)
+        self.fitness_fn(self.population)
         
         population_fitness = [p.fitness for p in self.population]
         self.average_fitness = self.sum_population()/len(self.population)
@@ -95,6 +87,7 @@ class EA:
         if((self.generation%2) == 0):
             print "GENERATION:: " +str(self.generation)
             print "Max fitness: " +str(self.best_individual.fitness) +": " + str(self.best_individual)
+        
         self.plotter.update()
         
 #        if self.parent_selection_fn is Selection.rank:
@@ -104,11 +97,14 @@ class EA:
 #        if self.adult_selection_fn is Selection.over_production and self.overproduction_factor is 1:
 #            self.overproduction_factor = int( raw_input("Over production factor: ") )
         self.reproducers = self.parent_selection_fn(self.population, self.sum_population(), self.overproduction_factor, self.rank_min, self.rank_max, self.k, self.e)
+        print "Population", len(self.population)
+        print "Reproducers", len(self.reproducers)
         
     def reproduce(self):
         self.children = []
         for p in self.reproducers:
             self.children.append(p.crossover( self.reproducers[random.randint(0,len(self.reproducers)-1)], self.crossover_rate ))
+        print "Children", len(self.children)
     
     def operate(self):
         for p in self.children:
@@ -139,7 +135,7 @@ class Selection:
     #SELECTION PROTOCOLS
     @staticmethod
     def full_gen_replacement(population, children, pop_size):
-        return children
+        return children[:pop_size]
     
     @staticmethod
     def over_production(population, children, pop_size):
@@ -247,14 +243,13 @@ class Selection:
                     reproducers.append( tournament_group[0] )
             group_k = group_k + k
         return reproducers
-    
-   
-    
+
 FITNESS_FUNCTIONS = {1: FitnessEval.one_max_fitness,
                      2: FitnessEval.blotto_fitness,
                      3: FitnessEval.izzy_spike_interval,
                      4: FitnessEval.izzy_spike_time,
-                     5: FitnessEval.izzy_waveform}
+                     5: FitnessEval.izzy_waveform,
+                     6: FitnessEval.aggregated_fitness}
 
 PARENT_SELECTION_FUNCTIONS = {1: Selection.fitness_proportionate, 
                               2: Selection.sigma_scaling, 
@@ -286,14 +281,16 @@ if __name__ == '__main__':
 #    adult_selection_nr = int( raw_input("Adult selection: ") )
 #    fitness_fn = int( raw_input("Fitness function: "))
     for _ in range(10):
-        ea = EA(INDIVIDUAL_TYPE[3], USED_FITNESS_FUNCTIONS, ADULT_SELECTION_FUNCTIONS[3], PARENT_SELECTION_FUNCTIONS[2], PLOT_TYPE[3])
+        ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[6], ADULT_SELECTION_FUNCTIONS[2], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
         ea.create()
         ea.develop()
+        
         for _ in range(0, ea.generations):
             ea.select()
             ea.reproduce()
             ea.operate()
             ea.replace()
+        
         ea.plotter.plot()
 #    population = [Izzy() for _ in range(1000)]
 #    print [p.genotype for p in population]
