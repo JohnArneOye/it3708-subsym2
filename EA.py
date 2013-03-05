@@ -13,13 +13,13 @@ class EA:
     generations = 150 #Number of generations
     generation = 0 #Current generation number
     fitness_goal = 1000 #The fitness goal
-    crossover_rate = 0.95 #The rate of which to perform crossover
+    crossover_rate = 0.5 #The rate of which to perform crossover
     k = 5 #Group size in k_tournament
     e = 0.1 #Probability of selecting random in k_tournament
-    mutation_probability = 0.1 #Probability that mutation of a specimen will occur
+    mutation_probability = 0.4 #Probability that mutation of a specimen will occur
     mutation_count = 1 #Number of bits mutated when mutating
-    rank_max = 2.0 #Max in rank selection
-    rank_min = 0.0 #Min in rank selection
+    rank_max = 1.6 #Max in rank selection
+    rank_min = 0.4 #Min in rank selection
     overproduction_factor = 2 #The factor of children to be produced with OP
     
     stagnate_counter = 0

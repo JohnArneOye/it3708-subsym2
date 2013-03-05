@@ -88,7 +88,7 @@ class NeuroPlot:
         self.std_deviation.append(self.ea.std_deviation)
     
     def plot(self):
-        training_nr = 1
+        training_nr = 4
         spiketrain1 = self.ea.best_overall_individual.spiketrain
         spiketrain2 = read_training_files()
         
