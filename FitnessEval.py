@@ -63,6 +63,7 @@ def izzy_spike_time(population):
     power = 2
     S_b = izhikevich_neuron.find_spikes(trainingdata, 0)
     
+    fitnesses = {}
     for p in population:
         S_a = p.spikes
         
@@ -78,14 +79,17 @@ def izzy_spike_time(population):
         nv = sigma ** (power ** -1)
         dist = nv/N
         
-        print "DISTANCE "+str(dist)
+        # print "DISTANCE "+str(dist)
         p.set_distance( dist )
-        fitness = (1.0/dist)*1000
-        print "Fitness "+str(fitness)
-        p.set_fitness( fitness )
+        fitness = (1.0/dist)*200
+        # print "Spike time", "Fitness", fitness
+        fitnesses[p] = fitness
+    
+    avg_fitness = sum(fitnesses.values()) / len(fitnesses)
+    [p.set_fitness(fitness/avg_fitness*100) for p, fitness in fitnesses.iteritems()]
 
 def izzy_spike_interval(population):
-    power = 4
+    power = 2
     S_b = izhikevich_neuron.find_spikes(trainingdata, 0)
     for p in population:
         S_a = p.spikes
@@ -101,22 +105,31 @@ def izzy_spike_interval(population):
             sigma += abs((S_a[i] - S_a[i-1]) - (S_b[i] - S_b[i-1]))**power
         
         distance = sigma ** (power ** -1) / (N - 1)
-        print "DISTANCE", distance
-        fitness = (1 / distance) * 1000
-        print "Fitness", fitness
+        # print "DISTANCE", distance
+        fitness = (1 / distance) * 300
+        # print "Spike interval", "Fitness", fitness
         p.set_fitness(fitness)
 
 def izzy_waveform(population):
     power = 2
     for p in population:
-        st = p.spiketrain
-        td = trainingdata
+        step = 5
+        st = p.spiketrain[::step]
+        td = trainingdata[::step]
         
         tsum = 0
         for va,vb in zip(st, td):
             tsum += (va-vb)**power
         tsum = tsum**(power**-1)
-        tsum /= 1001
-        print "Distance", tsum
-        print "Fitness", 1/tsum
+        tsum /= 1000 * step
+        # print "Distance", tsum
+        # print "Waveform", "Fitness", 1/tsum
         p.set_fitness( 1/tsum )
+
+def spike_count_difference_penalty(population):
+    training_spikes = izhikevich_neuron.find_spikes(trainingdata, 0)
+    for p in population:
+        diff = abs(len(training_spikes) - len(p.spikes))
+        fitness = (2*len(trainingdata)) / diff
+        # print "DIFF", fitness
+        # p.set_fitness(fitness)

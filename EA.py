@@ -18,11 +18,11 @@ class EA:
     crossover_rate = 0.6 #The rate of which to perform crossover
     k = 5 #Group size in k_tournament
     e = 0.1 #Probability of selecting random in k_tournament
-    mutation_probability = 0.4 #Probability that mutation of a specimen will occur
+    mutation_probability = 0.5 #Probability that mutation of a specimen will occur
     mutation_count = 1 #Number of bits mutated when mutating
     rank_max = 2.0 #Max in rank selection
     rank_min = 0.0 #Min in rank selection
-    overproduction_factor = 0 #The factor of children to be produced with OP
+    overproduction_factor = 0.5 #The factor of children to be produced with OP
     
     stagnate_counter = 0
 
@@ -38,10 +38,10 @@ class EA:
     parent_selection_fn = None
     fitness = None
     
-    def __init__(self, individual_type, fitness_fn, adult_selection_fn, parent_selection_fn, plotting_fn):
+    def __init__(self, individual_type, fitness_fns, adult_selection_fn, parent_selection_fn, plotting_fn):
         self.adult_selection_fn = adult_selection_fn
         self.parent_selection_fn = parent_selection_fn
-        self.fitness = fitness_fn
+        self.fitness_functions = fitness_fns
         self.plotter = plotting_fn(self)
         self.individual_type = individual_type
         self.best_individual = None
@@ -57,20 +57,27 @@ class EA:
     
     def select(self):
         self.population_fitness = []
-        self.fitness(self.population)
-            
+        
+        for p in self.population:
+            p.fitness = 0
+        
+        for fitness_fn in self.fitness_functions:
+            fitness_fn(self.population)
+        
         population_fitness = [p.fitness for p in self.population]
         self.average_fitness = self.sum_population()/len(self.population)
         self.previously_best_individual = self.best_individual
         self.best_individual = self.sorted_population()[0]
+        self.worst_individual = self.sorted_population()[-1]
+        print "BW", self.best_individual.fitness, self.worst_individual.fitness
         self.std_deviation = sum( map(lambda x: (x - self.average_fitness)**2, population_fitness) )
         
         #keep the best overall individual
-        if self.best_overall_individual is not None:
-            if self.best_overall_individual.fitness < self.best_individual.fitness:
-                self.best_overall_individual = self.best_individual
-        else:
-            self.best_overall_individual = self.best_individual
+        # if self.best_overall_individual is not None:
+        #     if self.best_overall_individual.fitness < self.best_individual.fitness:
+        #         self.best_overall_individual = self.best_individual
+        # else:
+        self.best_overall_individual = self.best_individual
         
         #count stagnate_counter if previously best is same fitness as this best
         if self.previously_best_individual is not None:
@@ -156,7 +163,7 @@ class Selection:
         average_fitness = sum_fitness/len(population)
         mating_wheel = []
         for p in population:
-            if average_fitness is 0:
+            if average_fitness == 0:
                 expected_mating = 1
             else:
                 expected_mating = int(round(p.fitness/average_fitness))
@@ -168,6 +175,8 @@ class Selection:
         for _ in range(0, int(len(population)*op) ):
             reproducers.append( mating_wheel[random.randint(0,len(mating_wheel)-1)] )
         
+        
+        print "Reproducers:", len(reproducers)
         return reproducers
        
     #Sigma scaling of fitness and spins the wheel 
@@ -262,8 +271,14 @@ INDIVIDUAL_TYPE = {1: OneMaxIndividual,
 
 PLOT_TYPE = {1: Plotting, 
              2: Blotting, 
-             3: NeuroPlot}  
+             3: NeuroPlot}
 
+USED_FITNESS_FUNCTIONS = (
+    FitnessEval.izzy_spike_interval,
+    FitnessEval.izzy_spike_time,
+    FitnessEval.izzy_waveform,
+    FitnessEval.spike_count_difference_penalty,
+)
 
 if __name__ == '__main__':
 #    individual_type = int( raw_input("OneMax, Blotto or Izzy "))
@@ -271,7 +286,7 @@ if __name__ == '__main__':
 #    adult_selection_nr = int( raw_input("Adult selection: ") )
 #    fitness_fn = int( raw_input("Fitness function: "))
     for _ in range(10):
-        ea = EA(INDIVIDUAL_TYPE[3], FITNESS_FUNCTIONS[4], ADULT_SELECTION_FUNCTIONS[3], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
+        ea = EA(INDIVIDUAL_TYPE[3], USED_FITNESS_FUNCTIONS, ADULT_SELECTION_FUNCTIONS[3], PARENT_SELECTION_FUNCTIONS[3], PLOT_TYPE[3])
         ea.create()
         ea.develop()
         for _ in range(0, ea.generations):

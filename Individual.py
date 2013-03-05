@@ -4,6 +4,8 @@ import sys
 from abc import*
 
 class Individual:
+    n_fitness_settings = 0
+    fitness = 0
     
     @abstractmethod
     def mutate(self, mutation_prob): pass
@@ -14,9 +16,11 @@ class Individual:
     @abstractmethod
     def development(self): pass
     
-    @abstractmethod
     def set_fitness(self, fitness):
-        self.fitness = fitness
+        """Add a fitness to average."""
+        # self.n_fitness_settings += 1
+        self.fitness += fitness # * (self.n_fitness_settings - 1)) + self.fitness) / self.n_fitness_settings
+        # print "Added fitness:", fitness, "now we have:", self.fitness
 
     def __str__(self):
         return str(self.phenotype)

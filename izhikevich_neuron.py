@@ -55,14 +55,15 @@ class Izzy(Individual):
         #GET ON DA SPIKE TRAIN! CHOO CHOO!
         self.spiketrain = []
         for _ in range(1001):
+            self.v = (1/self.t)*(self.k*self.v**2 + 5*self.v + 140 + self.I - self.u)
+            self.u = (self.a/self.t)*(self.b*self.v - self.u)
+            self.spiketrain.append(self.v)
+        
             if self.v > self.threshold:
                 self.v = self.c
                 self.u += self.d
-            self.v += (1/self.t)*(self.k*self.v*self.v + 5*self.v + 140 + self.I - self.u)
-            self.u += (self.a/self.t)*(self.b*self.v - self.u)
-            self.spiketrain.append(self.v)
-        
-        
+            
+            
         #We must find the spikes! I.e. find where the train tops or goes over threshold?
         self.spikes = find_spikes(self.spiketrain, 0)
         
