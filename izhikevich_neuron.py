@@ -116,16 +116,4 @@ def find_spikes(data, t):
             spikes.append(i+2)  
     return spikes
     
-if __name__ == '__main__':
-#    population = [Izzy() for _ in range(10)]
-#    print [p.genotype for p in population]
-#    for p in population:
-#        p.develop()
-#    print [p for p in population]
-    data = [random.random() for _ in range(0, 1001)]
-    t = 0.2
-    spikes = [0]
-    spikes.extend( [ data.index(data[i+2]) for i,j in zip(range(1,997,5),range(5,1002,5)) if data[i+2]==max(data[i:j]) and data[i+2]>t ] )
-    print data
-    print spikes
         
